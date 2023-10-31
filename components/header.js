@@ -1,71 +1,76 @@
-import React from "react";
-import { NativeBaseProvider, Box, HStack, Image, IconButton } from "native-base";
+import React, { useRef, useState } from "react";
+import { View, StatusBar } from "react-native";
+import {
+  Drawer,
+  Button,
+  Text,
+  GlueProvider,
+  Box,
+  Divider,
+} from "gluestack";
+import Header from "./components/header";
+import List from "./screens/list";
+import Article from "./screens/article";
 
-// Functional Component with props
-const Header = (props) => {
+// Functional Component
+const App = () => {
+  // State Declaration
+  const [page, setPage] = useState("list");
+  // Ref Declaration
+  const drawer = useRef(null);
+
+  // Arrow Function inside Functional Component
+  const changePage = (pageName) => {
+    // Close Drawer
+    drawer.current.close();
+    // Change state value
+    setPage(pageName);
+  };
+
+  // Arrow Function inside Functional Component
+  const navigationView = (
+    <Box p={4} bg="#222222" flex={1}>
+      <Button
+        full
+        bg="dark"
+        onPress={() => changePage("list")}
+      >
+        <Text>List</Text>
+      </Button>
+      <Divider my={4} />
+      <Button
+        full
+        bg="dark"
+        onPress={() => changePage("article")}
+      >
+        <Text>Article</Text>
+      </Button>
+      <Divider my={4} />
+      <Button
+        full
+        bg="dark"
+        onPress={() => drawer.current.close()}
+      >
+        <Text>Close</Text>
+      </Button>
+    </Box>
+  );
+
   return (
-    <NativeBaseProvider>
-      <Box bg="#AA0002" flexDirection="row" justifyContent="space-between" p={4}>
-        <IconButton
-          onPress={() => props.drawer.current.openDrawer()}
-          icon={
-            <Image
-              source={require("../assets/menu.png")}
-              alt="Menu Icon"
-              w={18}
-              h={18}
-            />
-          }
-        />
-        <HStack space={2} alignItems="center">
-          <IconButton
-            icon={
-              <Image
-                source={require("../assets/facebook.png")}
-                alt="Facebook Icon"
-                w={36}
-                h={16}
-                resizeMode="contain"
-              />
-            }
-          />
-          <IconButton
-            icon={
-              <Image
-                source={require("../assets/youtube.png")}
-                alt="YouTube Icon"
-                w={36}
-                h={16}
-                resizeMode="contain"
-              />
-            }
-          />
-          <IconButton
-            icon={
-              <Image
-                source={require("../assets/twitter.png")}
-                alt="Twitter Icon"
-                w={36}
-                h={16}
-                resizeMode="contain"
-              />
-            }
-          />
-          <IconButton
-            icon={
-              <Image
-                source={require("../assets/search.png")}
-                alt="Search Icon"
-                w={36}
-                h={16}
-                resizeMode="contain"
-              />
-            }
-          />
-        </HStack>
-      </Box>
-    </NativeBaseProvider>
+    <GlueProvider>
+      <Drawer
+        ref={drawer}
+        content={navigationView}
+        onClose={() => changePage("list")}
+      >
+        <StatusBar backgroundColor="#AA0002" barStyle="light-content" />
+        <Header drawer={drawer} />
+        <View>
+          {page === "list" ? <List /> : page === "article" ? <Article /> : null}
+        </View>
+      </Drawer>
+    </GlueProvider>
   );
 };
 
-export default Header;
+export default App;
